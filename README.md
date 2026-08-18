@@ -32,17 +32,43 @@ anything you have made or edited.
 
 | Map | What it demonstrates |
 | --- | --- |
-| Grow weekly active teams | The ordinary case: a B2B product growth goal |
-| Apple: ninety days of cash (1997) | Actors you do not control. Microsoft and the clone makers sit on the map beside the products, because in 1997 they moved the number more than any feature could |
+| Netflix: a million subscribers (2001) | Customer acquisition, and a deliverable that is a business model rather than a feature |
+| Apple: ninety days of cash (1997) | Actors you do not control — Microsoft and the clone makers sit on the map beside the products |
+| Anthropic: the pre-IPO year (2026) | A goal whose real risk is not growth but *durability*, which is made of other people's behaviour |
 | Cut ambulance handover delays | A goal that goes *down*, and deliverables that are almost all process rather than software |
-| New engineers shipping in week one | An internal platform goal, where the obstruction is your own access-request queue |
 
-The Apple map is an imagining rather than a historical document, but the things
-hanging off it are real: the $150M Microsoft investment and patent settlement
-announced at Macworld Boston in August 1997, the end of the Mac OS licensing
-programme, the four-square product grid, Think Different, and a fiscal 1997 loss of
-just over a billion dollars. Statuses reflect where each item stood at the time, so
-the map reads as a snapshot rather than a retrospective.
+Two of them are reconstructions rather than documents, and both say so on the goal card.
+
+**Netflix** is set in 2001, planning the run at the IPO, and hangs off the public
+record: the $19.95 unlimited plan that dropped late fees and due dates, the regional
+distribution centres built for next-day delivery, Cinematch, the studio revenue-share
+deals, and roughly 456,000 subscribers at the end of 2001 against 600,000 by the May
+2002 listing. The Blockbuster branch is the one worth reading — the strongest
+deliverable on the map is not a feature but a model the competitor could not copy
+without cannibalising its own late fees.
+
+**Apple** imagines the map Jobs might have drawn on returning in 1997. The things
+hanging off it are real: the $150M Microsoft investment and patent settlement announced
+at Macworld Boston that August, the end of the Mac OS licensing programme, the
+four-square product grid, Think Different, and a fiscal 1997 loss of just over a
+billion dollars.
+
+**Anthropic** is an outside-in reconstruction built only from public reporting in
+August 2026 — a run-rate of roughly $65B at the end of July, up from about $9B at the
+end of 2025; second-quarter revenue above $11.5B against $787M a year earlier;
+confidential draft paperwork filed; investors expecting the year to close between
+$100B and $120B. **Nothing in it comes from inside the company and it is not
+Anthropic's plan.** It earns its place because a pre-IPO year is an unusually clean
+impact-mapping problem: the growth is not in doubt, its durability is, and durability
+is made of other people's behaviour — which is exactly what the middle two columns
+are for.
+
+Statuses on all of these reflect where each item stood at the time, so a map reads as
+a snapshot rather than a retrospective.
+
+Retiring an example is deliberately conservative: when a built-in map stops shipping,
+it is removed from existing browsers only while still untouched. Rename or edit one
+and it stays, because at that point it is your map, not ours.
 
 ## Hosting it
 

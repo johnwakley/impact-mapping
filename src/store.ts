@@ -11,7 +11,11 @@ import type {
 } from './types.ts'
 import { KIND_META, createNode, newId } from './model/schema.ts'
 import { descendants, isDescendant, selectionAfterDelete } from './model/tree.ts'
-import { allSampleMaps, withMissingSamples } from './model/sample.ts'
+import {
+  allSampleMaps,
+  withMissingSamples,
+  withoutRetiredSamples,
+} from './model/sample.ts'
 import { localMapStorage } from './model/storage.ts'
 
 /** Shape version of the persisted blob. See `migrate` below before changing it. */
@@ -21,7 +25,7 @@ const PERSIST_VERSION = 1
  * Bumped when built-in example maps are added. Anyone with saved work gets the
  * new ones seeded in once, without touching maps they made or edited.
  */
-const SEED_VERSION = 2
+const SEED_VERSION = 3
 
 type Editable<T> = Partial<Omit<T, 'id' | 'kind' | 'parent' | 'children'>>
 export type NodePatch = Editable<GoalNode> &
@@ -399,7 +403,8 @@ export const useStore = create<Store>()(
         // New built-in examples arrive once, and only if the user has not
         // already got (or deliberately deleted and re-seeded past) them.
         if ((merged.seedVersion ?? 0) < SEED_VERSION) {
-          const seeded = withMissingSamples(merged.maps, merged.order)
+          const pruned = withoutRetiredSamples(merged.maps, merged.order)
+          const seeded = withMissingSamples(pruned.maps, pruned.order)
           merged.maps = seeded.maps
           merged.order = seeded.order
           merged.seedVersion = SEED_VERSION

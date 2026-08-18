@@ -11,6 +11,7 @@ import {
   allSampleMaps,
   sampleMap,
   withMissingSamples,
+  withoutRetiredSamples,
 } from './sample.ts'
 import { ancestors, assumptionFor, countByKind, descendants, visibleIds } from './tree.ts'
 
@@ -21,6 +22,26 @@ import { ancestors, assumptionFor, countByKind, descendants, visibleIds } from '
  *
  *   node --test src/model/
  */
+
+/**
+ * Tests derive the nodes they need from the tree's shape rather than naming ids
+ * from whichever example ships first. Content changes; structure does not.
+ */
+function ofKind<K extends MapNode['kind']>(
+  map: ImpactMap,
+  kind: K,
+): Extract<MapNode, { kind: K }>[] {
+  return Object.values(map.nodes).filter(
+    (n): n is Extract<MapNode, { kind: K }> => n.kind === kind,
+  )
+}
+
+function deliverableUnder(map: ImpactMap, direction: 'support' | 'obstruct') {
+  return ofKind(map, 'deliverable').find((d) => {
+    const parent = d.parent ? map.nodes[d.parent] : undefined
+    return parent?.kind === 'impact' && parent.direction === direction
+  })
+}
 
 function collapse(map: ImpactMap, id: string): ImpactMap {
   const next = structuredClone(map)
@@ -269,9 +290,17 @@ describe('exports', () => {
   })
 
   it('carries the whole chain on every CSV row', () => {
-    const [, firstRow] = toCsv(map).split('\n')
-    assert.match(firstRow, /Grow weekly active teams/)
-    assert.match(firstRow, /Team admins/)
+    const goalTitle = map.nodes[map.rootId].title
+    const actorTitles = ofKind(map, 'actor').map((a) => a.title)
+    const rows = toCsv(map).split('\n').slice(1)
+    assert.ok(rows.length > 0)
+    for (const row of rows) {
+      assert.ok(row.includes(goalTitle), `row lost its goal: ${row}`)
+      assert.ok(
+        actorTitles.some((title) => row.includes(title)),
+        `row lost its actor: ${row}`,
+      )
+    }
   })
 
   it('writes every actor and deliverable into the markdown', () => {
@@ -288,63 +317,75 @@ describe('assumptions', () => {
   const map = sampleMap()
 
   it('reads a deliverable back as its full chain', () => {
-    const bet = assumptionFor(map, 'd-bulk')
+    const deliverable = deliverableUnder(map, 'support')
+    assert.ok(deliverable, 'the first example needs a supporting branch')
+    const bet = assumptionFor(map, deliverable.id)
     assert.ok(bet)
-    assert.match(bet.goal, /Grow weekly active teams/)
-    assert.equal(bet.actor, 'Team admins')
-    assert.match(bet.impact, /Invite the rest of their team/)
+    const chain = ancestors(map, deliverable.id)
+    assert.equal(bet.goal, map.nodes[map.rootId].title)
+    assert.equal(bet.actor, chain.find((n) => n.kind === 'actor')?.title)
+    assert.equal(bet.impact, chain.find((n) => n.kind === 'impact')?.title)
+    assert.equal(bet.deliverable, deliverable.title)
     assert.equal(bet.obstructing, false)
   })
 
   it('flags a chain hanging off an obstruction', () => {
-    const bet = assumptionFor(map, 'd-defer')
-    assert.ok(bet)
-    assert.equal(bet.obstructing, true)
+    const deliverable = deliverableUnder(map, 'obstruct')
+    assert.ok(deliverable, 'the first example needs an obstructing branch')
+    assert.equal(assumptionFor(map, deliverable.id)?.obstructing, true)
   })
 
   it('has nothing to say about non-deliverables', () => {
-    assert.equal(assumptionFor(map, 'a-admins'), null)
+    assert.equal(assumptionFor(map, ofKind(map, 'actor')[0].id), null)
+    assert.equal(assumptionFor(map, map.rootId), null)
   })
 
-  it('walks up to the goal', () => {
-    const trail = ancestors(map, 'd-bulk').map((n) => n.id)
-    assert.deepEqual(trail, ['goal', 'a-admins', 'i-invite'])
+  it('walks up to the goal through one node per level', () => {
+    const deliverable = ofKind(map, 'deliverable')[0]
+    const trail = ancestors(map, deliverable.id)
+    assert.deepEqual(
+      trail.map((n) => n.kind),
+      ['goal', 'actor', 'impact'],
+    )
+    assert.equal(trail[0].id, map.rootId)
   })
 })
 
 describe('drop targeting', () => {
   const map = sampleMap()
   const layout = layoutMap(map)
+  const dragged = ofKind(map, 'deliverable')[0]
+  const elsewhere = ofKind(map, 'impact').filter((i) => i.id !== dragged.parent)
 
   it('lands a deliverable in the branch it was dropped into', () => {
-    const target = layout.placements['i-daily']
-    const found = findDropTarget(map, layout, map.nodes['d-bulk'], {
-      x: target.x,
-      y: target.y + target.height / 2,
+    const target = elsewhere[0]
+    const place = layout.placements[target.id]
+    const found = findDropTarget(map, layout, dragged, {
+      x: place.x,
+      y: place.y + place.height / 2,
     })
-    assert.equal(found?.parentId, 'i-daily')
+    assert.equal(found?.parentId, target.id)
   })
 
   it('will not hang a deliverable off a goal', () => {
-    const root = layout.placements['goal']
-    const found = findDropTarget(map, layout, map.nodes['d-bulk'], {
-      x: root.x,
-      y: root.y,
-    })
+    const root = layout.placements[map.rootId]
+    const found = findDropTarget(map, layout, dragged, { x: root.x, y: root.y })
     assert.equal(map.nodes[found!.parentId].kind, 'impact')
   })
 
   it('has nowhere to put the goal itself', () => {
-    assert.equal(findDropTarget(map, layout, map.nodes['goal'], { x: 0, y: 0 }), null)
+    assert.equal(findDropTarget(map, layout, map.nodes[map.rootId], { x: 0, y: 0 }), null)
   })
 
   it('picks an insertion index from the drop height', () => {
-    const first = layout.placements['d-digest']
-    const found = findDropTarget(map, layout, map.nodes['d-bulk'], {
-      x: first.x,
-      y: first.y,
+    const target = elsewhere.find((i) => i.children.length >= 2)
+    assert.ok(target, 'need an impact with two deliverables to test ordering')
+    const firstChild = layout.placements[target.children[0]]
+    const found = findDropTarget(map, layout, dragged, {
+      x: firstChild.x,
+      y: firstChild.y,
     })
-    assert.equal(found?.parentId, 'i-daily')
+    assert.equal(found?.parentId, target.id)
     assert.equal(found?.index, 0)
   })
 })
@@ -393,5 +434,74 @@ describe('seeding a returning browser', () => {
     assert.equal(seeded.maps['mine-1'].name, 'Mine')
     assert.equal(seeded.order[0], 'mine-1')
     assert.equal(seeded.added, SAMPLE_SPECS.length)
+  })
+})
+
+describe('retiring an old built-in map', () => {
+  /** A map exactly as the previous release shipped it: never opened, never edited. */
+  function asShipped(id: string, name: string): ImpactMap {
+    const stamp = '2026-01-01T00:00:00.000Z'
+    return { ...sampleMap(), id, name, createdAt: stamp, updatedAt: stamp }
+  }
+
+  const RETIRED_ID = 'sample'
+  const RETIRED_NAME = 'Grow weekly active teams'
+
+  it('removes a retired map that was never touched', () => {
+    const untouched = asShipped(RETIRED_ID, RETIRED_NAME)
+    const result = withoutRetiredSamples({ [RETIRED_ID]: untouched }, [RETIRED_ID])
+    assert.equal(result.removed, 1)
+    assert.equal(result.maps[RETIRED_ID], undefined)
+    assert.deepEqual(result.order, [])
+  })
+
+  it('keeps a retired map that has been edited', () => {
+    const edited = asShipped(RETIRED_ID, RETIRED_NAME)
+    edited.updatedAt = '2026-06-01T00:00:00.000Z'
+    const result = withoutRetiredSamples({ [RETIRED_ID]: edited }, [RETIRED_ID])
+    assert.equal(result.removed, 0)
+    assert.ok(result.maps[RETIRED_ID], 'edited work must survive the upgrade')
+    assert.deepEqual(result.order, [RETIRED_ID])
+  })
+
+  it('keeps a retired map that has been renamed', () => {
+    const renamed = asShipped(RETIRED_ID, 'My version of it')
+    const result = withoutRetiredSamples({ [RETIRED_ID]: renamed }, [RETIRED_ID])
+    assert.equal(result.removed, 0)
+    assert.equal(result.maps[RETIRED_ID].name, 'My version of it')
+  })
+
+  it('leaves maps that were never built-in alone', () => {
+    const mine = { ...sampleMap(), id: 'mine', name: 'Mine' }
+    const result = withoutRetiredSamples({ mine }, ['mine'])
+    assert.equal(result.removed, 0)
+    assert.ok(result.maps['mine'])
+  })
+
+  it('takes a previous-release library to the current one', () => {
+    // What an existing browser actually holds: the two retired examples, one of
+    // them edited, plus a map of the user's own.
+    const untouched = asShipped(RETIRED_ID, RETIRED_NAME)
+    const edited = asShipped('sample-first-deploy', 'New engineers shipping in week one')
+    edited.updatedAt = '2026-06-01T00:00:00.000Z'
+    const mine = { ...sampleMap(), id: 'mine', name: 'Mine' }
+
+    const before = {
+      [RETIRED_ID]: untouched,
+      'sample-first-deploy': edited,
+      mine,
+    }
+    const order = [RETIRED_ID, 'sample-first-deploy', 'mine']
+
+    const pruned = withoutRetiredSamples(before, order)
+    const after = withMissingSamples(pruned.maps, pruned.order)
+
+    assert.equal(after.maps[RETIRED_ID], undefined, 'untouched example should go')
+    assert.ok(after.maps['sample-first-deploy'], 'edited example should stay')
+    assert.ok(after.maps['mine'], 'the user map should stay')
+    for (const spec of SAMPLE_SPECS) {
+      assert.ok(after.maps[spec.id], `current example ${spec.id} should be present`)
+    }
+    assert.equal(new Set(after.order).size, after.order.length)
   })
 })

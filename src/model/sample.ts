@@ -26,171 +26,198 @@ interface SampleSpec {
   spec: Spec
 }
 
-/* ------------------------------------------------- 1. product growth ---- */
+/* ------------------------------------------ 1. subscriber acquisition -- */
 
-const WEEKLY_ACTIVE_TEAMS: Spec = {
-  id: 'goal',
+/**
+ * Netflix in 2001, planning the run at the IPO. Grounded in the public record:
+ * the $19.95 unlimited plan that dropped late fees and due dates, the regional
+ * distribution centres built for next-day delivery, Cinematch, the studio
+ * revenue-sharing deals, and roughly 456,000 subscribers at the end of 2001
+ * against 600,000 by the May 2002 listing.
+ *
+ * Worth reading for the Blockbuster branch: the strongest deliverable on the map
+ * is not a feature, it is a business model the competitor cannot copy without
+ * cannibalising a sixth of its own profit.
+ */
+const NETFLIX: Spec = {
+  id: 'nf-goal',
   kind: 'goal',
-  title: 'Grow weekly active teams from 400 to 1,000 by 31 December',
+  title: 'Grow paid subscribers from 300,000 to one million by the end of 2002',
   extra: {
-    metric: 'Weekly active teams',
-    unit: 'teams',
-    baseline: 400,
-    current: 520,
-    target: 1000,
-    deadline: '2026-12-31',
+    metric: 'Paid subscribers',
+    unit: 'subscribers',
+    baseline: 300000,
+    current: 456000,
+    target: 1000000,
+    deadline: '2002-12-31',
   },
-  notes: 'A team counts as active if two or more members opened the app in the same week.',
+  notes: 'Subscribers, not revenue. Every other number we care about follows this one.',
   children: [
     {
-      id: 'a-admins',
+      id: 'nf-a-owners',
       kind: 'actor',
-      title: 'Team admins',
-      extra: { actorKind: 'user' },
-      children: [
-        {
-          id: 'i-invite',
-          kind: 'impact',
-          title: 'Invite the rest of their team during the first session',
-          extra: { direction: 'support' },
-          children: [
-            {
-              id: 'd-bulk',
-              kind: 'deliverable',
-              title: 'Bulk invite by email domain',
-              extra: { status: 'building', effort: 'M', confidence: 'high' },
-            },
-            {
-              id: 'd-checklist',
-              kind: 'deliverable',
-              title: 'Invite step in the onboarding checklist',
-              extra: { status: 'shipped', effort: 'S', confidence: 'high' },
-              notes: 'Shipped in June. Lifted first-week invites from 18% to 34% of new workspaces.',
-            },
-            {
-              id: 'd-directory',
-              kind: 'deliverable',
-              title: 'Import from Slack or Google Workspace directory',
-              extra: { status: 'idea', effort: 'L', confidence: 'low' },
-            },
-          ],
-        },
-        {
-          id: 'i-upgrade',
-          kind: 'impact',
-          title: 'Upgrade the plan without talking to sales',
-          extra: { direction: 'support' },
-          children: [
-            {
-              id: 'd-selfserve',
-              kind: 'deliverable',
-              title: 'Self-serve plan upgrade',
-              extra: { status: 'planned', effort: 'M', confidence: 'medium' },
-            },
-            {
-              id: 'd-nudge',
-              kind: 'deliverable',
-              title: 'Usage nudge when a workspace hits its seat limit',
-              extra: { status: 'idea', effort: 'S', confidence: 'medium' },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'a-ics',
-      kind: 'actor',
-      title: 'Individual contributors',
-      extra: { actorKind: 'user' },
-      children: [
-        {
-          id: 'i-daily',
-          kind: 'impact',
-          title: 'Open the app daily rather than weekly',
-          extra: { direction: 'support' },
-          children: [
-            {
-              id: 'd-digest',
-              kind: 'deliverable',
-              title: 'Daily digest of what changed',
-              extra: { status: 'shipped', effort: 'S', confidence: 'medium' },
-            },
-            {
-              id: 'd-push',
-              kind: 'deliverable',
-              title: 'Mobile push for @mentions',
-              extra: { status: 'planned', effort: 'M', confidence: 'medium' },
-            },
-          ],
-        },
-        {
-          id: 'i-sso',
-          kind: 'impact',
-          title: 'Give up during setup when asked to configure SSO',
-          extra: { direction: 'obstruct' },
-          notes: 'Seen in 6 of 11 onboarding sessions. Biggest single drop-off in the funnel.',
-          children: [
-            {
-              id: 'd-defer',
-              kind: 'deliverable',
-              title: 'Defer SSO until the fifth seat',
-              extra: { status: 'planned', effort: 'S', confidence: 'high' },
-            },
-            {
-              id: 'd-guided',
-              kind: 'deliverable',
-              title: 'Guided setup for the four commonest identity providers',
-              extra: { status: 'idea', effort: 'L', confidence: 'low' },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'a-it',
-      kind: 'actor',
-      title: 'Customer IT reviewers',
+      title: 'People who own a DVD player and have never rented online',
+      notes: 'Every DVD player sold is a household with a machine and nothing to play on it.',
       extra: { actorKind: 'customer' },
       children: [
         {
-          id: 'i-approve',
+          id: 'nf-i-try',
           kind: 'impact',
-          title: 'Approve the tool without a three-week security review',
+          title: 'Try the service without feeling they have signed up for anything',
           extra: { direction: 'support' },
           children: [
             {
-              id: 'd-trust',
+              id: 'nf-d-trial',
               kind: 'deliverable',
-              title: 'Public trust page with the SOC 2 report',
-              extra: { status: 'building', effort: 'M', confidence: 'high' },
+              title: 'Two-week free trial, cancelled from the website in one click',
+              extra: { status: 'shipped', effort: 'S', confidence: 'high' },
             },
             {
-              id: 'd-questionnaire',
+              id: 'nf-d-bundle',
               kind: 'deliverable',
-              title: 'Pre-filled standard security questionnaire',
-              extra: { status: 'idea', effort: 'S', confidence: 'medium' },
+              title: 'Bundle a trial in the box with new Toshiba and Sony players',
+              extra: { status: 'shipped', effort: 'M', confidence: 'high' },
+              notes: 'Reaches the household at the one moment it owns a player and no discs.',
+            },
+          ],
+        },
+        {
+          id: 'nf-i-wait',
+          kind: 'impact',
+          title: 'Assume renting by post means waiting a week for the film',
+          extra: { direction: 'obstruct' },
+          notes: 'The objection is not the price. It is that the film turns up after they stopped wanting it.',
+          children: [
+            {
+              id: 'nf-d-centres',
+              kind: 'deliverable',
+              title: 'Open regional distribution centres until most subscribers get next-day delivery',
+              extra: { status: 'building', effort: 'XL', confidence: 'high' },
             },
           ],
         },
       ],
     },
     {
-      id: 'a-support',
+      id: 'nf-a-subs',
       kind: 'actor',
-      title: 'Our support team',
-      extra: { actorKind: 'internal' },
+      title: 'Subscribers we already have',
+      extra: { actorKind: 'user' },
       children: [
         {
-          id: 'i-escalate',
+          id: 'nf-i-queue',
           kind: 'impact',
-          title: 'Resolve setup tickets without escalating to engineering',
+          title: 'Keep the queue full, so a disc is always in the post',
+          extra: { direction: 'support' },
+          notes: 'A subscriber with an empty queue has already cancelled. They just have not told us yet.',
+          children: [
+            {
+              id: 'nf-d-queue',
+              kind: 'deliverable',
+              title: 'The queue: choose films now, receive them as slots free up',
+              extra: { status: 'shipped', effort: 'M', confidence: 'high' },
+            },
+            {
+              id: 'nf-d-cinematch',
+              kind: 'deliverable',
+              title: 'Cinematch — recommend from what they rated, not from what is new',
+              extra: { status: 'building', effort: 'L', confidence: 'medium' },
+              notes: 'Also steers demand towards the back catalogue we already own outright.',
+            },
+          ],
+        },
+        {
+          id: 'nf-i-tell',
+          kind: 'impact',
+          title: 'Tell their friends the late fee is gone',
           extra: { direction: 'support' },
           children: [
             {
-              id: 'd-diagnostics',
+              id: 'nf-d-refer',
               kind: 'deliverable',
-              title: 'Self-serve workspace diagnostics page',
-              extra: { status: 'idea', effort: 'M', confidence: 'low' },
+              title: 'Refer a friend, both get a free month',
+              extra: { status: 'planned', effort: 'S', confidence: 'medium' },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'nf-a-blockbuster',
+      kind: 'actor',
+      title: 'Blockbuster',
+      notes: 'Nine thousand stores, and a large share of its profit coming from late fees.',
+      extra: { actorKind: 'competitor' },
+      children: [
+        {
+          id: 'nf-i-copy',
+          kind: 'impact',
+          title: 'Launch an unlimited plan and undercut us from the stores',
+          extra: { direction: 'obstruct' },
+          children: [
+            {
+              id: 'nf-d-selection',
+              kind: 'deliverable',
+              title: 'Win on selection: 11,500 titles no shop can put on a shelf',
+              extra: { status: 'building', effort: 'L', confidence: 'high' },
+            },
+            {
+              id: 'nf-d-model',
+              kind: 'deliverable',
+              title: 'Keep the model one they cannot copy cheaply',
+              extra: { status: 'shipped', effort: 'M', confidence: 'medium' },
+              notes: 'Our advantage is not the discs. It is that matching us costs them their late fees.',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'nf-a-studios',
+      kind: 'actor',
+      title: 'The studios',
+      extra: { actorKind: 'partner' },
+      children: [
+        {
+          id: 'nf-i-revshare',
+          kind: 'impact',
+          title: 'License titles on a revenue share rather than $100 a copy',
+          extra: { direction: 'support' },
+          notes: 'Buying inventory outright is what caps how many copies of a new release we can stock.',
+          children: [
+            {
+              id: 'nf-d-deals',
+              kind: 'deliverable',
+              title: 'Revenue-sharing deals with Warner, Columbia and Universal',
+              extra: { status: 'building', effort: 'L', confidence: 'medium' },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'nf-a-ops',
+      kind: 'actor',
+      title: 'Our own warehouse teams',
+      extra: { actorKind: 'internal' },
+      children: [
+        {
+          id: 'nf-i-turnaround',
+          kind: 'impact',
+          title: 'Turn a returned disc around the same day it arrives',
+          extra: { direction: 'support' },
+          children: [
+            {
+              id: 'nf-d-sorting',
+              kind: 'deliverable',
+              title: 'Automated sorting and same-day dispatch at every centre',
+              extra: { status: 'planned', effort: 'L', confidence: 'medium' },
+            },
+            {
+              id: 'nf-d-nearest',
+              kind: 'deliverable',
+              title: 'Ship from the centre nearest the subscriber, not the one holding the disc',
+              extra: { status: 'idea', effort: 'M', confidence: 'medium' },
             },
           ],
         },
@@ -601,131 +628,223 @@ const HANDOVER: Spec = {
   ],
 }
 
-/* -------------------------------------------- 4. an internal platform --- */
+/* ------------------------------------------------ 4. the pre-IPO year -- */
 
-const FIRST_DEPLOY: Spec = {
-  id: 'fd-goal',
+/**
+ * An outside-in reconstruction, built only from public reporting in August 2026:
+ * a run-rate of roughly $65B at the end of July, up from about $9B at the end of
+ * 2025; second-quarter revenue above $11.5B against $787M a year earlier;
+ * confidential draft paperwork filed; and investors expecting the year to close
+ * somewhere between $100B and $120B.
+ *
+ * It is not Anthropic's plan and nothing here comes from inside the company. It
+ * is on the map because a pre-IPO year is an unusually clear impact-mapping
+ * problem: the growth is not in doubt, its *durability* is, and durability is
+ * made of other people's behaviour.
+ */
+const ANTHROPIC_PRE_IPO: Spec = {
+  id: 'an-goal',
   kind: 'goal',
-  title: 'Cut the median time from offer accepted to first change in production from 23 days to 5',
+  title: 'Close 2026 at a $100–120B run-rate, on revenue durable enough to underwrite the listing',
   extra: {
-    metric: 'Median days to first production change',
-    unit: 'days',
-    baseline: 23,
-    current: 19,
-    target: 5,
-    deadline: '2027-06-30',
+    metric: 'Annualised run-rate revenue',
+    unit: '$B',
+    baseline: 9,
+    current: 65,
+    target: 110,
+    deadline: '2026-12-31',
   },
+  notes: 'From public reporting only, nothing internal. Growth is not the hard part; durability is.',
   children: [
     {
-      id: 'fd-a-new',
+      id: 'an-a-enterprise',
       kind: 'actor',
-      title: 'Newly hired engineers',
-      extra: { actorKind: 'internal' },
+      title: 'Enterprise platform teams',
+      notes: 'The people who put Claude into something their own customers depend on.',
+      extra: { actorKind: 'customer' },
       children: [
         {
-          id: 'fd-i-dayone',
+          id: 'an-i-commit',
           kind: 'impact',
-          title: 'Get a working environment on day one without asking anyone',
+          title: 'Commit to multi-year capacity instead of renewing month to month',
           extra: { direction: 'support' },
+          notes: 'A month-to-month book of business is priced as a month-to-month book of business.',
           children: [
             {
-              id: 'fd-d-onecmd',
+              id: 'an-d-capacity',
               kind: 'deliverable',
-              title: 'One command that builds and runs the whole stack',
-              extra: { status: 'building', effort: 'L', confidence: 'medium' },
+              title: 'Capacity commitments with price certainty over the term',
+              extra: { status: 'planned', effort: 'L', confidence: 'medium' },
             },
             {
-              id: 'fd-d-laptop',
+              id: 'an-d-deprecation',
               kind: 'deliverable',
-              title: 'Laptop arrives configured rather than in a box',
-              extra: { status: 'shipped', effort: 'M', confidence: 'high' },
+              title: 'A published deprecation policy, so a model they built on has a known lifetime',
+              extra: { status: 'building', effort: 'M', confidence: 'high' },
             },
           ],
         },
         {
-          id: 'fd-i-access',
+          id: 'an-i-second',
           kind: 'impact',
-          title: 'Spend the first fortnight requesting access one system at a time',
+          title: 'Keep a second provider wired up so they can switch in a week',
           extra: { direction: 'obstruct' },
-          notes: 'Measured at 11 separate requests, each with its own approver and its own waiting.',
+          notes: 'This is the whole question. A buyer who can leave in a week contracts as though they will.',
           children: [
             {
-              id: 'fd-d-bundles',
+              id: 'an-d-evals',
               kind: 'deliverable',
-              title: 'Access bundles by role, granted when the contract is signed',
-              extra: { status: 'planned', effort: 'M', confidence: 'high' },
+              title: 'Help customers build evals on their own work, which travel badly to another model',
+              extra: { status: 'planned', effort: 'L', confidence: 'medium' },
+            },
+            {
+              id: 'an-d-agents',
+              kind: 'deliverable',
+              title: 'Agents that hold context across a long task, not single calls anyone can re-route',
+              extra: { status: 'building', effort: 'XL', confidence: 'medium' },
             },
           ],
         },
       ],
     },
     {
-      id: 'fd-a-buddies',
+      id: 'an-a-devs',
       kind: 'actor',
-      title: 'Onboarding buddies',
-      extra: { actorKind: 'internal' },
+      title: 'Developers choosing what to build on',
+      extra: { actorKind: 'user' },
       children: [
         {
-          id: 'fd-i-task',
+          id: 'an-i-first',
           kind: 'impact',
-          title: 'Hand over a real starter task instead of inventing one on the spot',
+          title: 'Reach for Claude first when starting something new',
           extra: { direction: 'support' },
           children: [
             {
-              id: 'fd-d-queue',
+              id: 'an-d-code',
               kind: 'deliverable',
-              title: 'A standing queue of small, real, reviewable-in-a-day tasks',
-              extra: { status: 'planned', effort: 'S', confidence: 'medium' },
+              title: 'Claude Code — meet developers in the terminal they already live in',
+              extra: { status: 'shipped', effort: 'XL', confidence: 'high' },
+            },
+            {
+              id: 'an-d-mcp',
+              kind: 'deliverable',
+              title: 'MCP and the SDKs, so connecting a tool is an afternoon rather than a project',
+              extra: { status: 'shipped', effort: 'L', confidence: 'high' },
             },
           ],
         },
       ],
     },
     {
-      id: 'fd-a-security',
+      id: 'an-a-investors',
       kind: 'actor',
-      title: 'IT and security reviewers',
-      extra: { actorKind: 'internal' },
+      title: 'Institutional investors and sell-side analysts',
+      notes: 'They do not need the 2028 forecast to be certain. They need to see how it is built.',
+      extra: { actorKind: 'partner' },
       children: [
         {
-          id: 'fd-i-approve',
+          id: 'an-i-underwrite',
           kind: 'impact',
-          title: 'Approve access in hours rather than in the Thursday batch',
+          title: 'Underwrite the forecast rather than discount it',
           extra: { direction: 'support' },
           children: [
             {
-              id: 'fd-d-preapproved',
+              id: 'an-d-cohorts',
               kind: 'deliverable',
-              title: 'Pre-approved bundles so the happy path needs no human at all',
+              title: 'Disclose net revenue retention and cohort expansion, not just the headline run-rate',
               extra: { status: 'planned', effort: 'M', confidence: 'medium' },
             },
             {
-              id: 'fd-d-audit',
+              id: 'an-d-margin',
               kind: 'deliverable',
-              title: 'Quarterly access review, so removing the gate does not remove the control',
-              extra: { status: 'idea', effort: 'M', confidence: 'high' },
+              title: 'Show cost per task falling faster than price per token',
+              extra: { status: 'planned', effort: 'L', confidence: 'medium' },
+            },
+            {
+              id: 'an-d-concentration',
+              kind: 'deliverable',
+              title: 'Name the customer concentration risk before an analyst does',
+              extra: { status: 'idea', effort: 'S', confidence: 'high' },
             },
           ],
         },
       ],
     },
     {
-      id: 'fd-a-managers',
+      id: 'an-a-rivals',
       kind: 'actor',
-      title: 'Hiring managers',
+      title: 'The other frontier labs',
+      extra: { actorKind: 'competitor' },
+      children: [
+        {
+          id: 'an-i-price',
+          kind: 'impact',
+          title: 'Reset the price per token faster than our costs come down',
+          extra: { direction: 'obstruct' },
+          notes: 'A price war we win on quality and lose on margin still shows up in the filing.',
+          children: [
+            {
+              id: 'an-d-task',
+              kind: 'deliverable',
+              title: 'Compete on finished tasks rather than benchmark scores',
+              extra: { status: 'building', effort: 'L', confidence: 'medium' },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'an-a-safety',
+      kind: 'actor',
+      title: 'Our own safety and policy researchers',
+      notes: 'Once the company is public, the safety record becomes a financial fact too.',
       extra: { actorKind: 'internal' },
       children: [
         {
-          id: 'fd-i-early',
+          id: 'an-i-safetycase',
           kind: 'impact',
-          title: 'Start the setup at offer acceptance rather than on the first morning',
+          title: 'Ship the safety case alongside the model rather than after it',
           extra: { direction: 'support' },
           children: [
             {
-              id: 'fd-d-trigger',
+              id: 'an-d-cards',
               kind: 'deliverable',
-              title: 'Checklist that fires the moment an offer is accepted',
-              extra: { status: 'shipped', effort: 'S', confidence: 'high' },
+              title: 'System cards and evaluations published with each release',
+              extra: { status: 'shipped', effort: 'M', confidence: 'high' },
+            },
+            {
+              id: 'an-d-rsp',
+              kind: 'deliverable',
+              title: 'Scaling commitments written so an external auditor could check them',
+              extra: { status: 'building', effort: 'L', confidence: 'medium' },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'an-a-regulators',
+      kind: 'actor',
+      title: 'Regulators and standards bodies',
+      extra: { actorKind: 'regulator' },
+      children: [
+        {
+          id: 'an-i-sufficient',
+          kind: 'impact',
+          title: 'Treat our disclosures as sufficient rather than opening an inquiry mid-roadshow',
+          extra: { direction: 'support' },
+          children: [
+            {
+              id: 'an-d-prebrief',
+              kind: 'deliverable',
+              title: 'Brief them on the release process before the filing, not after',
+              extra: { status: 'planned', effort: 'M', confidence: 'medium' },
+            },
+            {
+              id: 'an-d-incident',
+              kind: 'deliverable',
+              title: 'A documented incident-reporting route that already has traffic on it',
+              extra: { status: 'idea', effort: 'M', confidence: 'medium' },
             },
           ],
         },
@@ -737,10 +856,20 @@ const FIRST_DEPLOY: Spec = {
 /* ------------------------------------------------------------ building -- */
 
 export const SAMPLE_SPECS: readonly SampleSpec[] = [
-  { id: 'sample', name: 'Grow weekly active teams', spec: WEEKLY_ACTIVE_TEAMS },
+  { id: 'sample-netflix', name: 'Netflix: a million subscribers (2001)', spec: NETFLIX },
   { id: 'sample-apple-1997', name: 'Apple: ninety days of cash (1997)', spec: APPLE_1997 },
+  { id: 'sample-anthropic-ipo', name: 'Anthropic: the pre-IPO year (2026)', spec: ANTHROPIC_PRE_IPO },
   { id: 'sample-handover', name: 'Cut ambulance handover delays', spec: HANDOVER },
-  { id: 'sample-first-deploy', name: 'New engineers shipping in week one', spec: FIRST_DEPLOY },
+]
+
+/**
+ * Built-in maps that used to ship. They are cleared out on upgrade, but only
+ * when still untouched — an example someone has renamed or edited has become
+ * their map, not ours, and is left alone.
+ */
+const RETIRED_SAMPLES: ReadonlyArray<{ id: string; name: string }> = [
+  { id: 'sample', name: 'Grow weekly active teams' },
+  { id: 'sample-first-deploy', name: 'New engineers shipping in week one' },
 ]
 
 function flatten(spec: Spec, parent: string | null, out: Record<string, MapNode>): string {
@@ -788,6 +917,31 @@ export function sampleMap(): ImpactMap {
  * Used both when seeding a returning browser and by "Examples" in the map list,
  * so the two can never drift apart.
  */
+/**
+ * Drop built-in maps that no longer ship. A retired map is only removed while it
+ * is still exactly as we shipped it: same name, never edited. Anything the user
+ * has touched stays, because at that point it is their map.
+ */
+export function withoutRetiredSamples(
+  maps: Record<string, ImpactMap>,
+  order: readonly string[],
+): { maps: Record<string, ImpactMap>; order: string[]; removed: number } {
+  const doomed = RETIRED_SAMPLES.filter(({ id, name }) => {
+    const map = maps[id]
+    return Boolean(map) && map.name === name && map.updatedAt === map.createdAt
+  }).map(({ id }) => id)
+
+  if (!doomed.length) return { maps, order: [...order], removed: 0 }
+
+  const nextMaps = { ...maps }
+  for (const id of doomed) delete nextMaps[id]
+  return {
+    maps: nextMaps,
+    order: order.filter((id) => !doomed.includes(id)),
+    removed: doomed.length,
+  }
+}
+
 export function withMissingSamples(
   maps: Record<string, ImpactMap>,
   order: readonly string[],
