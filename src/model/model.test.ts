@@ -446,6 +446,8 @@ describe('retiring an old built-in map', () => {
 
   const RETIRED_ID = 'sample'
   const RETIRED_NAME = 'Grow weekly active teams'
+  const SOFT_ID = 'sample-first-deploy'
+  const SOFT_NAME = 'New engineers shipping in week one'
 
   it('removes a retired map that was never touched', () => {
     const untouched = asShipped(RETIRED_ID, RETIRED_NAME)
@@ -455,13 +457,30 @@ describe('retiring an old built-in map', () => {
     assert.deepEqual(result.order, [])
   })
 
-  it('keeps a retired map that has been edited', () => {
+  it('keeps an edited map that was only replaced, not withdrawn', () => {
+    const edited = asShipped(SOFT_ID, SOFT_NAME)
+    edited.updatedAt = '2026-06-01T00:00:00.000Z'
+    const result = withoutRetiredSamples({ [SOFT_ID]: edited }, [SOFT_ID])
+    assert.equal(result.removed, 0)
+    assert.ok(result.maps[SOFT_ID], 'edited work must survive the upgrade')
+    assert.deepEqual(result.order, [SOFT_ID])
+  })
+
+  it('removes a withdrawn map even once it has been edited', () => {
     const edited = asShipped(RETIRED_ID, RETIRED_NAME)
     edited.updatedAt = '2026-06-01T00:00:00.000Z'
     const result = withoutRetiredSamples({ [RETIRED_ID]: edited }, [RETIRED_ID])
+    assert.equal(result.removed, 1)
+    assert.equal(result.maps[RETIRED_ID], undefined)
+  })
+
+  it('still spares a withdrawn map that has been renamed', () => {
+    // Renaming makes it theirs, whatever the force flag says.
+    const renamed = asShipped(RETIRED_ID, 'Our Q4 plan')
+    renamed.updatedAt = '2026-06-01T00:00:00.000Z'
+    const result = withoutRetiredSamples({ [RETIRED_ID]: renamed }, [RETIRED_ID])
     assert.equal(result.removed, 0)
-    assert.ok(result.maps[RETIRED_ID], 'edited work must survive the upgrade')
-    assert.deepEqual(result.order, [RETIRED_ID])
+    assert.equal(result.maps[RETIRED_ID].name, 'Our Q4 plan')
   })
 
   it('keeps a retired map that has been renamed', () => {
@@ -482,7 +501,7 @@ describe('retiring an old built-in map', () => {
     // What an existing browser actually holds: the two retired examples, one of
     // them edited, plus a map of the user's own.
     const untouched = asShipped(RETIRED_ID, RETIRED_NAME)
-    const edited = asShipped('sample-first-deploy', 'New engineers shipping in week one')
+    const edited = asShipped(SOFT_ID, SOFT_NAME)
     edited.updatedAt = '2026-06-01T00:00:00.000Z'
     const mine = { ...sampleMap(), id: 'mine', name: 'Mine' }
 

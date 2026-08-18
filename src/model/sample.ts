@@ -862,13 +862,25 @@ export const SAMPLE_SPECS: readonly SampleSpec[] = [
   { id: 'sample-handover', name: 'Cut ambulance handover delays', spec: HANDOVER },
 ]
 
+interface RetiredSample {
+  id: string
+  name: string
+  /**
+   * Remove it even if it has been edited. Only for examples that were
+   * explicitly withdrawn rather than merely replaced. A retired map is always
+   * matched on its shipped name as well as its id, so a copy someone renamed
+   * is treated as theirs and survives either way.
+   */
+  force?: boolean
+}
+
 /**
- * Built-in maps that used to ship. They are cleared out on upgrade, but only
- * when still untouched — an example someone has renamed or edited has become
- * their map, not ours, and is left alone.
+ * Built-in maps that used to ship. They are cleared out on upgrade — by default
+ * only while still untouched, because an example someone has edited has become
+ * their map rather than ours.
  */
-const RETIRED_SAMPLES: ReadonlyArray<{ id: string; name: string }> = [
-  { id: 'sample', name: 'Grow weekly active teams' },
+const RETIRED_SAMPLES: readonly RetiredSample[] = [
+  { id: 'sample', name: 'Grow weekly active teams', force: true },
   { id: 'sample-first-deploy', name: 'New engineers shipping in week one' },
 ]
 
@@ -918,17 +930,19 @@ export function sampleMap(): ImpactMap {
  * so the two can never drift apart.
  */
 /**
- * Drop built-in maps that no longer ship. A retired map is only removed while it
- * is still exactly as we shipped it: same name, never edited. Anything the user
- * has touched stays, because at that point it is their map.
+ * Drop built-in maps that no longer ship. A retired map is removed only while it
+ * still carries the name we shipped it under, and — unless it is marked `force` —
+ * only while it has never been edited. Anything else stays, because at that
+ * point it is the user's map rather than ours.
  */
 export function withoutRetiredSamples(
   maps: Record<string, ImpactMap>,
   order: readonly string[],
 ): { maps: Record<string, ImpactMap>; order: string[]; removed: number } {
-  const doomed = RETIRED_SAMPLES.filter(({ id, name }) => {
+  const doomed = RETIRED_SAMPLES.filter(({ id, name, force }) => {
     const map = maps[id]
-    return Boolean(map) && map.name === name && map.updatedAt === map.createdAt
+    if (!map || map.name !== name) return false
+    return force === true || map.updatedAt === map.createdAt
   }).map(({ id }) => id)
 
   if (!doomed.length) return { maps, order: [...order], removed: 0 }

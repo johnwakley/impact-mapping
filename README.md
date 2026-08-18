@@ -156,9 +156,9 @@ recomputed from the tree on every render, so the map cannot drift out of tidy.
 
 Every path from the goal to a deliverable is one sentence, and the inspector prints it:
 
-> In order to **grow weekly active teams**, **team admins** will **invite the rest of
-> their team during the first session**. We are betting that **bulk invite by email
-> domain** makes that happen.
+> In order to **grow paid subscribers to one million**, **subscribers we already
+> have** will **keep the queue full, so a disc is always in the post**. We are betting
+> that **Cinematch** makes that happen.
 
 If the sentence does not hold together, the branch does not either. That is the fastest
 review the technique offers, so it is built into the UI rather than left to the reader.

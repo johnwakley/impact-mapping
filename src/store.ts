@@ -25,7 +25,7 @@ const PERSIST_VERSION = 1
  * Bumped when built-in example maps are added. Anyone with saved work gets the
  * new ones seeded in once, without touching maps they made or edited.
  */
-const SEED_VERSION = 3
+const SEED_VERSION = 4
 
 type Editable<T> = Partial<Omit<T, 'id' | 'kind' | 'parent' | 'children'>>
 export type NodePatch = Editable<GoalNode> &
