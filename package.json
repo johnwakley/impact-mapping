@@ -1,0 +1,30 @@
+{
+  "name": "impact-mapping",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Interactive impact mapping tool built on React Flow",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:single": "tsc --noEmit && SINGLE_FILE=1 vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test src/model/*.test.ts"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.11.3",
+    "html-to-image": "^1.11.13",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.0.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1"
+  }
+}
