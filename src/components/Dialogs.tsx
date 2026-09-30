@@ -147,6 +147,20 @@ export function MapsDialog({ onClose }: { onClose: () => void }): ReactElement {
             </div>
           )
         })}
+      {/* The link back to the appliedvibe.ai archive this tool is published in. */}
+      <div className="maps__sep" role="separator" />
+      <a
+        className="map-row map-row--external"
+        href="https://blog.appliedvibe.ai/"
+        target="_blank"
+        rel="noopener"
+        aria-label="More experiments at appliedvibe.ai (opens in a new tab)"
+      >
+        <span className="map-row__name">More experiments at appliedvibe.ai</span>
+        <span className="map-row__meta" aria-hidden="true">
+          ↗
+        </span>
+      </a>
     </Dialog>
   )
 }
