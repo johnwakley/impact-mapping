@@ -1,9 +1,22 @@
 import { useEffect, useRef } from 'react'
+import { controlOwnsKey, isTextEntry } from '../model/keys.ts'
+import type { FocusTarget } from '../model/keys.ts'
 import type { Placement } from '../model/layout.ts'
 import { visibleIds } from '../model/tree.ts'
 import { useStore } from '../store.ts'
 
-const TEXT_ENTRY = /^(INPUT|TEXTAREA|SELECT)$/
+/** Describe the focused element for the pure rules in model/keys.ts. */
+function describe(el: HTMLElement | null): FocusTarget {
+  // A key on an icon inside a button belongs to the button.
+  const control = el?.closest<HTMLElement>('button, a[href], input, textarea, select, summary, [role]') ?? el
+  return {
+    tag: control?.tagName ?? 'BODY',
+    role: control?.getAttribute('role') ?? null,
+    inputType: control instanceof HTMLInputElement ? control.type.toLowerCase() : null,
+    editable: el?.isContentEditable ?? false,
+    href: control instanceof HTMLAnchorElement && control.hasAttribute('href'),
+  }
+}
 
 /**
  * Whole-map keyboard driving. Up/down move within a *column* rather than within
@@ -20,7 +33,8 @@ export function useKeyboard(placements: Record<string, Placement>, enabled: bool
     const onKeyDown = (e: KeyboardEvent): void => {
       if (!enabledRef.current) return
       const target = e.target as HTMLElement | null
-      if (target && (target.isContentEditable || TEXT_ENTRY.test(target.tagName))) return
+      const focused = describe(target)
+      if (isTextEntry(focused)) return
       // Keys pressed inside a dialog belong to it. Without this, Tab in the Maps
       // dialog added a child card behind it instead of moving focus.
       if (target?.closest('[role="dialog"]')) return
@@ -42,6 +56,11 @@ export function useKeyboard(placements: Record<string, Placement>, enabled: bool
         return
       }
       if (mod) return
+      // A focused control keeps the keys it uses: Space and Enter press a
+      // toolbar button rather than toggling or adding a card, and Tab moves
+      // focus. Keys it has no use for (the arrows, Delete, F2) still drive the
+      // selection, so clicking Undo does not strand the keyboard.
+      if (controlOwnsKey(e.key, focused)) return
 
       const map = s.maps[s.activeId]
       const id = s.selectedId

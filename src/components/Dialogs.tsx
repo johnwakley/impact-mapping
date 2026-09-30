@@ -1,10 +1,14 @@
 import { Fragment, useEffect, useRef } from 'react'
 import type { ReactElement, ReactNode } from 'react'
+import { trapTab } from '../model/keys.ts'
 import { KIND_META } from '../model/schema.ts'
 import { countByKind } from '../model/tree.ts'
 import { useStore } from '../store.ts'
 import { toast } from '../toast.ts'
 import { Close, Plus, Trash } from './icons.tsx'
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 interface DialogProps {
   title: string
@@ -29,6 +33,20 @@ export function Dialog({ title, onClose, children, footer }: DialogProps): React
       if (e.key === 'Escape') {
         e.stopPropagation()
         onClose()
+        return
+      }
+      // aria-modal promises the page behind is inert, so Tab must not walk out
+      // of the dialog into it: it wraps from the last control to the first.
+      const dialog = ref.current
+      if (e.key !== 'Tab' || !dialog) return
+      const items = [...dialog.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+        (item) => item.getClientRects().length > 0,
+      )
+      const next = trapTab(items.indexOf(document.activeElement as HTMLElement), items.length, e.shiftKey)
+      if (items.length === 0) e.preventDefault()
+      else if (next !== null) {
+        e.preventDefault()
+        items[next].focus()
       }
     }
     document.addEventListener('keydown', onKeyDown, true)
