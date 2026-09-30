@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { KIND_META } from '../model/schema.ts'
 import { countByKind } from '../model/tree.ts'
@@ -14,6 +14,16 @@ interface DialogProps {
 }
 
 export function Dialog({ title, onClose, children, footer }: DialogProps): ReactElement {
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Take focus on open and give it back on close, so the keyboard lands in the
+  // dialog rather than staying on the toolbar button behind the overlay.
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null
+    ref.current?.focus()
+    return () => previous?.focus()
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
@@ -32,7 +42,14 @@ export function Dialog({ title, onClose, children, footer }: DialogProps): React
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dialog" role="dialog" aria-modal="true" aria-label={title}>
+      <div
+        ref={ref}
+        className="dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        tabIndex={-1}
+      >
         <div className="dialog__head">
           <span>{title}</span>
           <span style={{ flex: 1 }} />

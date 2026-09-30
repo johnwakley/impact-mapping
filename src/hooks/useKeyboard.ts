@@ -21,6 +21,9 @@ export function useKeyboard(placements: Record<string, Placement>, enabled: bool
       if (!enabledRef.current) return
       const target = e.target as HTMLElement | null
       if (target && (target.isContentEditable || TEXT_ENTRY.test(target.tagName))) return
+      // Keys pressed inside a dialog belong to it. Without this, Tab in the Maps
+      // dialog added a child card behind it instead of moving focus.
+      if (target?.closest('[role="dialog"]')) return
 
       const s = useStore.getState()
       if (s.editingId) return

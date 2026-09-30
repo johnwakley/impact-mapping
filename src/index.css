@@ -1086,6 +1086,12 @@ body {
   overflow: hidden;
 }
 
+/* The dialog takes focus on open only as a landing point for the keyboard;
+   the first Tab moves to a real control, which gets the normal ring. */
+.dialog:focus-visible {
+  outline: none;
+}
+
 .dialog__head {
   display: flex;
   align-items: center;
