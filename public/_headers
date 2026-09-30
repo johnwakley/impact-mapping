@@ -1,0 +1,32 @@
+# Security headers for impact-mapping.
+#
+# THIS APP'S OWN COPY. It is deployed by the appliedvibe.ai website-publisher
+# repo, whose apps/impact-mapping shell sets "sharedAssets": false: the app
+# brings its own design system (1,248 lines of CSS, its own tokens, light and
+# dark) and wants none of Pico, the riso tokens or the fonts. The publisher's
+# `npm run sync` therefore never touches this file — re-check it whenever
+# website-publisher's shared/_headers changes.
+#
+# The /* section is IDENTICAL to shared/_headers, deliberately. The app needed no
+# relaxation: it makes no network calls, loads nothing from a CDN, uses only
+# system fonts, and its PNG export goes through a data: URL, which the shared
+# `img-src 'self' data:` already permits. If you add a directive here, say
+# which line differs and why, the way block-royale's _headers does.
+
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; media-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  Permissions-Policy: accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()
+  X-Frame-Options: DENY
+
+# Vite content-hashes every file it emits under /assets/, so each URL is
+# immutable by construction: a changed file gets a new name. Never extend this
+# to index.html or any unhashed path, or a deploy goes unseen until the cache
+# expires. (website-publisher HANDOFF.md §7 #13.)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
