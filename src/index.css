@@ -16,14 +16,19 @@
   --border-strong: #c8cfd6;
   --text: #171a1f;
   --text-muted: #5f6b7a;
-  --text-faint: #8b95a3;
+  /* Every text token clears WCAG AA 4.5:1 on the surfaces it is used on:
+     faint on --surface/--surface-2/--bg (4.99/4.70/4.61), each accent on its
+     -soft tint and on every surface (lowest: --actor 4.65 on --surface-3).
+     Lifted 1 Oct 2026 from #8b95a3, #c2700a, #15803d, #b45309, #64748b,
+     which measured 2.66-4.53. */
+  --text-faint: #69707b;
   --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.05);
   --shadow-md: 0 4px 12px rgb(16 24 40 / 0.08), 0 2px 4px rgb(16 24 40 / 0.04);
   --shadow-lg: 0 12px 32px rgb(16 24 40 / 0.14), 0 4px 8px rgb(16 24 40 / 0.06);
 
   --goal: #7c3aed;
   --goal-soft: #f3eeff;
-  --actor: #c2700a;
+  --actor: #9e5b08;
   --actor-soft: #fdf3e3;
   --impact: #0f766e;
   --impact-soft: #e6f5f3;
@@ -32,13 +37,13 @@
   --obstruct: #be123c;
   --obstruct-soft: #fdeaee;
 
-  --ok: #15803d;
+  --ok: #147c3b;
   --ok-soft: #e7f5ec;
-  --warn: #b45309;
+  --warn: #ae5009;
   --warn-soft: #fdf2e0;
   --info: #1d4ed8;
   --info-soft: #eaf0fe;
-  --neutral: #64748b;
+  --neutral: #5e6d83;
   --neutral-soft: #eef0f3;
 
   --radius-sm: 5px;
@@ -60,7 +65,8 @@
     --border-strong: #3b4552;
     --text: #e7eaee;
     --text-muted: #99a3b0;
-    --text-faint: #6f7a88;
+    /* 5.10:1 on --surface, 4.64:1 on --surface-2. Was #6f7a88 at 3.2-3.9. */
+    --text-faint: #858e9a;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow-md: 0 4px 12px rgb(0 0 0 / 0.45);
     --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.55);
@@ -648,7 +654,9 @@ body {
 }
 .chip--muted {
   background: var(--neutral-soft);
-  color: var(--text-faint);
+  /* Not --text-faint: no faint grey clears 4.5:1 on this tint without
+     becoming --text-muted anyway. */
+  color: var(--text-muted);
 }
 .chip--dropped {
   text-decoration: line-through;
